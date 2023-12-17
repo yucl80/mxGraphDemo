@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>mxGraph层次布局示例</title>
+    <script src="https://cdn.jsdelivr.net/npm/mxgraph@4.2.2/javascript/mxClient.js"></script>
+    <style>
+        #graphContainer {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body onload="main()">
+    <div id="graphContainer"></div>
+    <script>
+        // 自定义布局算法
+       
+        // 创建一个新的类，继承自mxGraphLayout
+        function CustomLayout(graph) {
+            mxGraphLayout.call(this, graph);
+        }
+
+        // 继承mxGraphLayout
+        CustomLayout.prototype = new mxGraphLayout();
+        CustomLayout.prototype.constructor = CustomLayout;
+
+        // 实现自定义布局算法
+        CustomLayout.prototype.execute = function (parent) {
+            // 在这里实现你的自定义布局算法
+            // ...
+            var model = this.graph.getModel();
+
+            // Moves the vertices to build a circle. Makes sure the
+            // radius is large enough for the vertices to not
+            // overlap
+            model.beginUpdate();
+            try {
+                // Gets all vertices inside the parent and finds
+                // the maximum dimension of the largest vertex
+                var max = 0;
+                var top = null;
+                var left = null;
+                var vertices = [];
+                var childCount = model.getChildCount(parent);
+                var x = 20;
+                var y = 20;
+                for (var i = 0; i < childCount; i++) {
+                    var cell = model.getChildAt(parent, i);
+                   /* if (model.isVertex(cell)) {
+                        console.log(cell);
+                        cell.geometry.x = x;
+                        cell.geometry.y = y;
+                        x += 100;
+                        if (x > 400) {
+                            x = 20;
+                            y += 100;
+                        }
+                        this.setVertexLocation(cell, x,y);
+                    }*/
+
+
+                    if (!this.isVertexIgnored(cell)) {
+                        vertices.push(cell);
+                    }
+                }
+              
+                var r =100;
+                var vertexCount = vertices.length;   
+                var phi = 2 * Math.PI / vertexCount;            
+                for (var i = 0; i < vertexCount; i++) {
+                    if (this.isVertexMovable(vertices[i])) {
+                        this.setVertexLocation(vertices[i],
+                            Math.round(left + r + r * Math.sin(i * phi)),
+                            Math.round(top + r + r * Math.cos(i * phi)));
+                    }
+                }
+
+            }
+            finally {
+                model.endUpdate();
+            }
+            // 调用父类的execute方法来完成布局
+            mxGraphLayout.prototype.execute.apply(this, arguments);
+        };
+
+        function main() {
+
+            // 创建图形容器
+            const container = document.getElementById("graphContainer");
+            const graph = new mxGraph(container);
+
+            // 创建节点和边
+            const parent = graph.getDefaultParent();
+            const v1 = graph.insertVertex(parent, null, '1', 0, 0, 80, 30);
+            const v2 = graph.insertVertex(parent, null, '2', 0, 0, 80, 30);
+            const v3 = graph.insertVertex(parent, null, '3', 0, 0, 80, 30);
+            const v4 = graph.insertVertex(parent, null, '4', 0, 0, 80, 30);
+            const e1 = graph.insertEdge(parent, null, '', v1, v2);
+            const e2 = graph.insertEdge(parent, null, '', v1, v3);
+            const e3 = graph.insertEdge(parent, null, '', v1, v4);
+            const e4 = graph.insertEdge(parent, null, '', v4, v3);
+            const e5 = graph.insertEdge(parent, null, '', v4, v2);
+            const layout = new CustomLayout(graph);
+            layout.execute(parent);
+        }
+
+        // 使用自定义布局算法
+        //myLayout(graph);
+    </script>
+</body>
+
+</html>
