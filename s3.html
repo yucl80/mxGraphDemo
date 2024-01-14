@@ -220,7 +220,7 @@
                                     g.setParent(childCell.id, cell.id);
                                     //console.log("Child Cell " + childCell.id + ": " + JSON.stringify(childCell.geometry));
                                 } else if (model.isEdge(childCell)) {
-                                    g.setEdge(childCell.source.id, childCell.target.id, { label: childCell.value, labelpos: 'c', id: childCell.id, curve: d3.curveBasis });
+                                    g.setEdge(childCell.source.id, childCell.target.id, { label: childCell.value, labelpos: 'c', id: childCell.id, curve: d3.curveStepAfter });
                                 }
 
                             }
@@ -229,7 +229,7 @@
 
                     } else if (model.isEdge(cell)) {
                         //console.log(cell);
-                        g.setEdge(cell.source.id, cell.target.id, { label: cell.value, labelpos: 'c', id: cell.id, curve: d3.curveBasis });
+                        g.setEdge(cell.source.id, cell.target.id, { label: cell.value, labelpos: 'c', id: cell.id, curve: d3.curveStepAfter });
                     }
 
                 }
@@ -386,7 +386,7 @@
                 var p2 = dataPoints[i + 1];
 
                 // 计算t的值，t表示曲线上的位置，范围从0到1
-                var t = 0.1;
+                var t = 0.3;
 
                 // 计算三次样条曲线的控制点
                 var d1 = (1 - t) * (1 - t) * (1 - t);
@@ -448,14 +448,14 @@
             var style = graph.getStylesheet().getDefaultEdgeStyle();
 
             // 设置edge为曲线
-           // style[mxConstants.STYLE_EDGE] = mxEdgeStyle.ElbowConnector;
+            style[mxConstants.STYLE_EDGE] = mxEdgeStyle.ElbowConnector;
             style[mxConstants.STYLE_CURVED] = 1;
             // style[mxConstants.STYLE_DASHED] = 1;
             style[mxConstants.STYLE_ROUNDED] = 1;
             style[mxConstants.STYLE_SMOOTH] = 1;
             var style = graph.getStylesheet().getDefaultEdgeStyle();
-            style[mxConstants.STYLE_EDGE] = mxEdgeStyle.CurveBasisStyle;
-            // style[mxConstants.STYLE_EDGE] = mxEdgeStyle.curveBasis;
+            //style[mxConstants.STYLE_EDGE] = mxEdgeStyle.CurveBasisStyle;
+            style[mxConstants.STYLE_EDGE] = mxEdgeStyle.curveBasis;
 
             // model.setStyle(edge, 'edgeStyle=myEdgeStyle');
             // 创建节点和边
