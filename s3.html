@@ -371,7 +371,7 @@
             mxGraphLayout.prototype.execute.apply(this, arguments);
         };
 
-       
+
         function createSmoothCurve(dataPoints) {
             // 创建一个空数组来存储曲线上的点
             var curvePoints = [];
@@ -408,6 +408,28 @@
             return curvePoints;
         }
 
+        function createStepAfterCurve(dataPoints) {
+            // 创建一个空数组来存储曲线上的点
+            var curvePoints = [];
+
+            // 添加第一个数据点到曲线上
+            curvePoints.push(dataPoints[0]);
+
+            // 计算中间点
+            for (var i = 1; i < dataPoints.length; i++) {
+                var p0 = dataPoints[i - 1];
+                var p1 = dataPoints[i];
+
+                // 添加垂直线段的中间点
+                curvePoints.push({ x: p1.x, y: p0.y });
+
+                // 添加下一个数据点
+                curvePoints.push(p1);
+            }
+
+            return curvePoints;
+        }
+
         mxEdgeStyle.CurveBasisStyle = function (state, source, target, points, result) {
             var pts = state.absolutePoints;
             var p0 = pts[0];
@@ -425,16 +447,17 @@
                 }
             }
             if (points != null && points.length > 0) {
-               var ps = createSmoothCurve(points);
-               for(var i=0;i<ps.length;i++){
-                var l = ps[i].x + x;
-                var t = ps[i].y + y;
-                result.push({'x':l,'y':t});
-               }
-               
-            }          
-         
+                var ps = createSmoothCurve(points);
+                for (var i = 0; i < ps.length; i++) {
+                    var l = ps[i].x + x;
+                    var t = ps[i].y + y;
+                    result.push({ 'x': l, 'y': t });
+                }
+
+            }
+
         };
+        
         mxStyleRegistry.putValue('curveBasisStyle', mxEdgeStyle.CurveBasisStyle);
 
         function main() {
