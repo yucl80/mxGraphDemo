@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dagre D3 Demo</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="dagre-d3.js"></script>
+    <style>
+        .node {
+            stroke: #333;
+            fill: #fff;
+        }
+
+        .edgePath path {
+            stroke: #333;
+            fill: #none;
+        }
+    </style>
+</head>
+
+<body>
+    <svg id="svg-canvas" width="500" height="500"></svg>
+    <script>
+        // 创建一个新的有向图
+        var g = new dagreD3.graphlib.Graph({ compound: true, multigraph: true })
+            .setGraph({ rankdir: "TB" })
+            .setDefaultEdgeLabel(function () { return {}; });;
+        console.log(g);
+        // 添加节点到图中
+        g.setNode("A", { label: "Node A" });
+        g.setNode("B", { label: "Node B" });
+        g.setNode("C", { label: "Node C" });
+
+        // 添加边到图中
+        g.setEdge("A", "B", { label: 'ab1', id: 'edge1' });
+        g.setEdge("A", "B", { label: 'ab2', id: 'edge2',curve: d3.curveBasis});
+        g.setEdge("B", "C");
+        g.setEdge("A", "C", { label: 'ac3', id: 'ac3' });
+
+        // 创建一个新的D3渲染器
+        var render = new dagreD3.render();
+
+        // 选择svg元素，运行Dagre-D3渲染器
+        var svg = d3.select("#svg-canvas"),
+            svgGroup = svg.append("g");
+
+        render(svgGroup, g);
+      
+        // 设置svg元素的大小以适应图形
+        // svg.attr('width', g.graph().width + 40);
+        //  svg.attr('height', g.graph().height + 40);
+    </script>
+</body>
+
+</html>

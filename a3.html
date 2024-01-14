@@ -17,7 +17,7 @@
     <div id="graphContainer"></div>
     <script>
         // 自定义布局算法
-       
+
         // 创建一个新的类，继承自mxGraphLayout
         function CustomLayout(graph) {
             mxGraphLayout.call(this, graph);
@@ -49,27 +49,27 @@
                 var y = 20;
                 for (var i = 0; i < childCount; i++) {
                     var cell = model.getChildAt(parent, i);
-                   /* if (model.isVertex(cell)) {
-                        console.log(cell);
-                        cell.geometry.x = x;
-                        cell.geometry.y = y;
-                        x += 100;
-                        if (x > 400) {
-                            x = 20;
-                            y += 100;
-                        }
-                        this.setVertexLocation(cell, x,y);
-                    }*/
+                    /* if (model.isVertex(cell)) {
+                         console.log(cell);
+                         cell.geometry.x = x;
+                         cell.geometry.y = y;
+                         x += 100;
+                         if (x > 400) {
+                             x = 20;
+                             y += 100;
+                         }
+                         this.setVertexLocation(cell, x,y);
+                     }*/
 
 
                     if (!this.isVertexIgnored(cell)) {
                         vertices.push(cell);
                     }
                 }
-              
-                var r =100;
-                var vertexCount = vertices.length;   
-                var phi = 2 * Math.PI / vertexCount;            
+
+                var r = 100;
+                var vertexCount = vertices.length;
+                var phi = 2 * Math.PI / vertexCount;
                 for (var i = 0; i < vertexCount; i++) {
                     if (this.isVertexMovable(vertices[i])) {
                         this.setVertexLocation(vertices[i],
@@ -92,17 +92,31 @@
             const container = document.getElementById("graphContainer");
             const graph = new mxGraph(container);
 
+
+            // 获取图形样式
+            var style = graph.getStylesheet().getDefaultEdgeStyle();
+
+            // 设置edge为曲线
+            style[mxConstants.STYLE_EDGE] = mxEdgeStyle.ElbowConnector;
+            style[mxConstants.STYLE_CURVED] = 1;
+            style[mxConstants.STYLE_DASHED] = 1;
+           // style[mxConstants.STYLE_ROUNDED] = 1;
+          //  style[mxConstants.STYLE_SMOOTH] = 1;
             // 创建节点和边
             const parent = graph.getDefaultParent();
             const v1 = graph.insertVertex(parent, null, '1', 0, 0, 80, 30);
             const v2 = graph.insertVertex(parent, null, '2', 0, 0, 80, 30);
             const v3 = graph.insertVertex(parent, null, '3', 0, 0, 80, 30);
             const v4 = graph.insertVertex(parent, null, '4', 0, 0, 80, 30);
+            const v5 = graph.insertVertex(parent, null, '5', 0, 0, 80, 30);
             const e1 = graph.insertEdge(parent, null, '', v1, v2);
             const e2 = graph.insertEdge(parent, null, '', v1, v3);
             const e3 = graph.insertEdge(parent, null, '', v1, v4);
-            const e4 = graph.insertEdge(parent, null, '', v4, v3);
-            const e5 = graph.insertEdge(parent, null, '', v4, v2);
+            const e4 = graph.insertEdge(parent, null, '', v2, v3);
+            const e5 = graph.insertEdge(parent, null, '', v2, v2);
+            const e6 = graph.insertEdge(parent, null, '', v4, v5);
+            const e7 = graph.insertEdge(parent, null, '', v1, v5);
+            const e8 = graph.insertEdge(parent, null, '', v4, v2);
             const layout = new CustomLayout(graph);
             layout.execute(parent);
         }
