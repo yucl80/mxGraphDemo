@@ -386,7 +386,7 @@
                 var p2 = dataPoints[i + 1];
 
                 // 计算t的值，t表示曲线上的位置，范围从0到1
-                var t = 0.3;
+                var t = 0.1;
 
                 // 计算三次样条曲线的控制点
                 var d1 = (1 - t) * (1 - t) * (1 - t);
@@ -482,7 +482,7 @@
             const e9 = graph.insertEdge(parent, 'API->MBS', 'API->MBS', API, MBS);
             const e10 = graph.insertEdge(parent, 'webApp->SPA', 'webApp->SPA', webApp, SPA);
 
-            const e11 = graph.insertEdge(parent, 'webApp->SPA', 'webApp->SPA', person, Mail);
+            //const e11 = graph.insertEdge(parent, 'webApp->SPA', 'webApp->SPA', person, Mail);
 
             const layout = new CustomLayout(graph);
 
