@@ -220,7 +220,7 @@
                                     g.setParent(childCell.id, cell.id);
                                     //console.log("Child Cell " + childCell.id + ": " + JSON.stringify(childCell.geometry));
                                 } else if (model.isEdge(childCell)) {
-                                    g.setEdge(childCell.source.id, childCell.target.id, { label: childCell.value, labelpos: 'c', id: childCell.id, curve: d3.curveStepAfter });
+                                    g.setEdge(childCell.source.id, childCell.target.id, { label: childCell.value, labelpos: 'c', id: childCell.id, curve: d3.curveBasis });
                                 }
 
                             }
@@ -229,7 +229,7 @@
 
                     } else if (model.isEdge(cell)) {
                         //console.log(cell);
-                        g.setEdge(cell.source.id, cell.target.id, { label: cell.value, labelpos: 'c', id: cell.id, curve: d3.curveStepAfter });
+                        g.setEdge(cell.source.id, cell.target.id, { label: cell.value, labelpos: 'c', id: cell.id, curve: d3.curveBasis });
                     }
 
                 }
@@ -457,7 +457,7 @@
             }
 
         };
-        
+
         mxStyleRegistry.putValue('curveBasisStyle', mxEdgeStyle.CurveBasisStyle);
 
         function main() {
