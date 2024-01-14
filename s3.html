@@ -134,9 +134,9 @@
                         minY = Math.min(minY, y);
                         maxY = Math.max(maxY, y);
                     }
-                   // console.log(edge.value + ",points:" + JSON.stringify(points));
-                   // console.log("curCellGeo: " + curCellGeo.x + "," + curCellGeo.y + ";" + dx + "," + dy);
-                   // console.log("othCellGeo: " + othCell.id + "  : " + othCellGeo.x + "," + othCellGeo.y + ";" + dx + "," + dy);
+                    // console.log(edge.value + ",points:" + JSON.stringify(points));
+                    // console.log("curCellGeo: " + curCellGeo.x + "," + curCellGeo.y + ";" + dx + "," + dy);
+                    // console.log("othCellGeo: " + othCell.id + "  : " + othCellGeo.x + "," + othCellGeo.y + ";" + dx + "," + dy);
 
                     for (k = 0; k < pointsCount; k++) {
                         var p = points[k];
@@ -144,7 +144,7 @@
                         var ctly = p.y + edgeOffset.y;
                         var ny = p.y;
                         //当控制点都在source的上方时，排除cell下方的控制点
-                       // console.log("log " + curCellGeo.y + " : " + minY + " : " + maxY);
+                        // console.log("log " + curCellGeo.y + " : " + minY + " : " + maxY);
                         var keep = true;
                         if (curCellGeo.y - dy >= maxY) {
                             // console.log("top:" + ctly + " : " + (curCellGeo.y + dy));
@@ -371,54 +371,69 @@
             mxGraphLayout.prototype.execute.apply(this, arguments);
         };
 
+       
+        function createSmoothCurve(dataPoints) {
+            // 创建一个空数组来存储曲线上的点
+            var curvePoints = [];
+
+            // 添加第一个数据点到曲线上
+            curvePoints.push(dataPoints[0]);
+
+            // 计算中间点
+            for (var i = 1; i < dataPoints.length - 1; i++) {
+                var p0 = dataPoints[i - 1];
+                var p1 = dataPoints[i];
+                var p2 = dataPoints[i + 1];
+
+                // 计算t的值，t表示曲线上的位置，范围从0到1
+                var t = 0.3;
+
+                // 计算三次样条曲线的控制点
+                var d1 = (1 - t) * (1 - t) * (1 - t);
+                var d2 = 3 * t * (1 - t) * (1 - t);
+                var d3 = 3 * t * t * (1 - t);
+                var d4 = t * t * t;
+
+                // 计算中间点的坐标
+                var x = d1 * p0.x + d2 * p1.x + d3 * p2.x + d4 * p2.x;
+                var y = d1 * p0.y + d2 * p1.y + d3 * p2.y + d4 * p2.y;
+
+                // 将中间点添加到曲线上
+                curvePoints.push({ x: x, y: y });
+            }
+
+            // 添加最后一个数据点到曲线上
+            curvePoints.push(dataPoints[dataPoints.length - 1]);
+
+            return curvePoints;
+        }
 
         mxEdgeStyle.CurveBasisStyle = function (state, source, target, points, result) {
             var pts = state.absolutePoints;
             var p0 = pts[0];
             var pe = pts[pts.length - 1];
 
-            if (points != null && points.length > 0) {
-                var pt = points[0];
-                var n = points.length;
-
-                // Add the first point to the result
-                result.push(pt);
-
-                // Add the intermediate points as bezier handles
-                for (var i = 1; i < n; i++) {
-                    var tmp = points[i];
-                    var dx = (tmp.x - pt.x) / 4;
-                    var dy = (tmp.y - pt.y) / 4;
-
-                    result.push(new mxPoint(pt.x + dx, pt.y + dy));
-                    result.push(new mxPoint(tmp.x - dx, tmp.y - dy));
-                    result.push(tmp);
-
-                    pt = tmp;
+            var geo;
+            var x = 0;
+            var y = 0;
+            var edge = state.cell;
+            for (var ref = edge.parent; ref.parent; ref = ref.parent) {
+                geo = ref.geometry;
+                if (geo) {
+                    x = x + geo.x;
+                    y = y + geo.y;
                 }
             }
-
-            // Add the last point to the result
-            result.push(pe);
-
-            /*
-            var view = state.view;
-            var pt = (points != null && points.length > 0) ? points[0] : null;
-            var pts = state.absolutePoints;
-            var p0 = pts[0];
-            var pe = pts[pts.length - 1];
-
-            if (pt != null) {
-                var dx = pt.x - p0.x;
-                var dy = pt.y - p0.y;
-
-                result.push(new mxPoint(pt.x - dx / 2, pt.y - dy / 2));
-                result.push(pt);
-                result.push(new mxPoint(pt.x + dx / 2, pt.y + dy / 2));
-            }
-            else {
-                result.push(new mxPoint(pe.x, pe.y));
-            }*/
+            if (points != null && points.length > 0) {
+               var ps = createSmoothCurve(points);
+               for(var i=0;i<ps.length;i++){
+                var l = ps[i].x + x;
+                var t = ps[i].y + y;
+                result.push({'x':l,'y':t});
+               }
+               
+            }          
+         
         };
         mxStyleRegistry.putValue('curveBasisStyle', mxEdgeStyle.CurveBasisStyle);
 
@@ -433,13 +448,14 @@
             var style = graph.getStylesheet().getDefaultEdgeStyle();
 
             // 设置edge为曲线
-            //style[mxConstants.STYLE_EDGE] = mxEdgeStyle.ElbowConnector;
-            //style[mxConstants.STYLE_CURVED] = 1;
+           // style[mxConstants.STYLE_EDGE] = mxEdgeStyle.ElbowConnector;
+            style[mxConstants.STYLE_CURVED] = 1;
             // style[mxConstants.STYLE_DASHED] = 1;
             style[mxConstants.STYLE_ROUNDED] = 1;
             style[mxConstants.STYLE_SMOOTH] = 1;
             var style = graph.getStylesheet().getDefaultEdgeStyle();
-            //  style[mxConstants.STYLE_EDGE] = mxEdgeStyle.CurveBasisStyle;
+            style[mxConstants.STYLE_EDGE] = mxEdgeStyle.CurveBasisStyle;
+            // style[mxConstants.STYLE_EDGE] = mxEdgeStyle.curveBasis;
 
             // model.setStyle(edge, 'edgeStyle=myEdgeStyle');
             // 创建节点和边
@@ -466,7 +482,11 @@
             const e9 = graph.insertEdge(parent, 'API->MBS', 'API->MBS', API, MBS);
             const e10 = graph.insertEdge(parent, 'webApp->SPA', 'webApp->SPA', webApp, SPA);
 
+            const e11 = graph.insertEdge(parent, 'webApp->SPA', 'webApp->SPA', person, Mail);
+
             const layout = new CustomLayout(graph);
+
+            //const layout = new mxPartitionLayout(graph);
             layout.execute(parent);
 
             /*
